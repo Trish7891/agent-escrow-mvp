@@ -15,6 +15,8 @@ What is here:
 | validator | `tools/validate.py` | checks spec + bundle + cross-bindings, recomputes `terms_hash` |
 | terms guide | `docs/job-spec.md` | how to write a job that can actually be judged |
 | decision procedure | `docs/adjudication.md` | 14 rules + failure taxonomy |
+| validation runbook | `docs/validation-week.md` | one real $100 job, seven days, kill criteria |
+| ruling template | `templates/ruling.md` | fixed-format public ruling |
 | worked example | `examples/` | $2 USDC job, 4 tests, refund-on-silence |
 | deploy script | `script/Deploy.s.sol` | Base Sepolia / Base |
 
@@ -117,6 +119,9 @@ Honest list, because most escrow pitches skip it:
   ever changes, get a licence first.
 
 ## The one-week validation, if you want to test it for real
+
+Full day-by-day version with commands, cost model and kill criteria:
+[`docs/validation-week.md`](docs/validation-week.md). The short version:
 
 1. One real `$100` job with a person (not an agent) as buyer.
 2. 2-of-3 multisig on Base instead of the contract — faster to set up, same
