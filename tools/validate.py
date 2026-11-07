@@ -174,6 +174,7 @@ def check_evidence(job: dict, ev: dict, rep: Report) -> None:
 
     st = ev.get("settlement")
     if st:
+        before = len(rep.failures)
         if st["payer"].lower() != job["buyer"].get("address", "").lower():
             rep.fail("settlement payer is not the job buyer")
         if st["payee"].lower() != job["seller"].get("address", "").lower():
@@ -184,7 +185,8 @@ def check_evidence(job: dict, ev: dict, rep: Report) -> None:
             rep.warn("settlement recorded with 0 confirmations")
         if not st["nonce"].startswith(job["job_ref"]):
             rep.warn("settlement nonce is not namespaced by job_ref: replay across jobs is possible")
-        rep.ok("settlement fields present and structurally bound to this job")
+        if len(rep.failures) == before:
+            rep.ok("settlement fields present and structurally bound to this job")
     else:
         rep.warn("no settlement block: fine for a chain-escrowed job, not for an off-chain payment claim")
 
