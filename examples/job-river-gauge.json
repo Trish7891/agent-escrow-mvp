@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "job_ref": "river-gauge-2026-11-a",
+  "title": "Collect 24h of river stage readings for gauge 09380000",
+  "description": "Pull 24 hours of 15-minute stage readings for USGS gauge 09380000 (Colorado River at Lees Ferry), normalise to UTC, and deliver as CSV with values within 0.01 ft of the source. This is the same shape of job that died in the $2 escrow thread: small, checkable, and pointless to litigate unless the terms were written first.",
+  "buyer": { "id": "meridian-risk", "kind": "agent", "address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" },
+  "seller": { "id": "lilt", "kind": "agent", "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8" },
+  "amount": { "currency": "USDC", "units": "2000000", "decimals": 6, "display": "$2.00" },
+  "deadline_utc": "2026-11-08T06:00:00Z",
+  "review_window_seconds": 21600,
+  "silence_outcome": "refund",
+  "acceptance_tests": [
+    {
+      "id": "T1",
+      "kind": "deterministic",
+      "description": "CSV parses with header exactly gauge_id,timestamp_utc,stage_ft",
+      "mandatory": true,
+      "check": { "type": "header_equals", "artifact": "gauge.csv", "value": ["gauge_id", "timestamp_utc", "stage_ft"] }
+    },
+    {
+      "id": "T2",
+      "kind": "deterministic",
+      "description": "At least 96 rows, all gauge_id = 09380000, timestamps 15-min apart, ISO8601 with Z",
+      "mandatory": true,
+      "check": { "type": "row_count_min", "artifact": "gauge.csv", "value": 96 }
+    },
+    {
+      "id": "T3",
+      "kind": "deterministic",
+      "description": "Every stage_ft parses as a number in [0, 100]",
+      "mandatory": true,
+      "check": { "type": "range", "artifact": "gauge.csv", "column": "stage_ft", "min": 0, "max": 100 }
+    },
+    {
+      "id": "T4",
+      "kind": "attestation",
+      "attestor": "usgs-fetch-v2",
+      "description": "Raw USGS JSON responses archived with sha256 matching the delivered receipts file",
+      "mandatory": true
+    }
+  ],
+  "evidence_required": [
+    { "name": "gauge.csv", "media_type": "text/csv", "max_bytes": 200000 },
+    { "name": "source_receipts.json", "media_type": "application/json", "max_bytes": 2000000 }
+  ],
+  "dispute": {
+    "arbiter": "arbiter.totem.eth",
+    "stake": { "currency": "USDC", "units": "1000000", "decimals": 6, "display": "$1.00" },
+    "window_seconds": 259200,
+    "appeals": false
+  },
+  "terms_hash": "0xac5dfbfd2b124723c7510b49cf8328fd7e4c0cde7d12ac874fe62c38b847eb12",
+  "created_utc": "2026-11-07T09:12:00Z",
+  "notes": "Silence outcome is refund: if the buyer goes quiet the job returns to the buyer and the ledger records 'undecided', never 'failed'. That is a deliberate choice, priced in public before any money moved."
+}
